@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.UserMoodPraiseRelDao">
+
+    <resultMap type="com.ssm.entity.UserMoodPraiseRel" id="UserMoodPraiseRelMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="moodId" column="mood_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMoodPraiseRelMap">
+        select id,
+               user_id,
+               mood_id
+        from ssmproject.user_mood_praise_rel
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMoodPraiseRelMap">
+        select id,
+               user_id,
+               mood_id
+        from ssmproject.user_mood_praise_rel limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="UserMoodPraiseRelMap">
+        select
+        id, user_id, mood_id
+        from ssmproject.user_mood_praise_rel
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="moodId != null and moodId != ''">
+                and mood_id = #{moodId}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="save" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.user_mood_praise_rel(user_id, mood_id)
+        values (#{userId}, #{moodId})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.user_mood_praise_rel(user_id, mood_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.moodId})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.user_mood_praise_rel(user_id, mood_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.moodId})
+        </foreach>
+        on duplicate key update
+        user_id = values(user_id) , mood_id = values(mood_id)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update ssmproject.user_mood_praise_rel
+        <set>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="moodId != null and moodId != ''">
+                mood_id = #{moodId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from ssmproject.user_mood_praise_rel
+        where id = #{id}
+    </delete>
+
+</mapper>
+

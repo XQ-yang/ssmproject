@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.MoodDao">
+
+    <resultMap type="com.ssm.entity.Mood" id="MoodMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="publishTime" column="publish_time" jdbcType="TIMESTAMP"/>
+        <result property="praiseNum" column="praise_num" jdbcType="INTEGER"/>
+        <result property="account" column="account" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="MoodMap">
+        select m.id,
+               m.content,
+               m.user_id,
+               m.publish_time,
+               m.praise_num,
+               u.account
+        from ssmproject.mood m,
+             ssmproject.user u
+        where m.user_id = u.id
+          and m.id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="MoodMap">
+        select m.id,
+               m.content,
+               m.user_id,
+               m.publish_time,
+               m.praise_num,
+               u.account
+        from ssmproject.mood m,
+             ssmproject.user u
+        where m.user_id = u.id limit #{offset}
+            , #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="MoodMap">
+        select
+        m.id, m.content, m.user_id, m.publish_time, m.praise_num, u.account
+        from ssmproject.mood m, ssmproject.user u
+        where m.user_id = u.id
+        <if test="id != null and id != ''">
+            and m.id = #{id}
+        </if>
+        <if test="content != null and content != ''">
+            and m.content = #{content}
+        </if>
+        <if test="userId != null and userId != ''">
+            and m.user_id = #{userId}
+        </if>
+        <if test="publishTime != null">
+            and m.publish_time = #{publishTime}
+        </if>
+        <if test="praiseNum != null">
+            and m.praise_num = #{praiseNum}
+        </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.mood(content, user_id, publish_time, praise_num)
+        values (#{content}, #{userId}, #{publishTime}, #{praiseNum})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.mood(content, user_id, publish_time, praise_num)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.content}, #{entity.userId}, #{entity.publishTime}, #{entity.praiseNum})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ssmproject.mood(content, user_id, publish_time, praise_num)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.content}, #{entity.userId}, #{entity.publishTime}, #{entity.praiseNum})
+        </foreach>
+        on duplicate key update
+        content = values(content) , user_id = values(user_id) , publish_time = values(publish_time) , praise_num =
+        values(praise_num)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update ssmproject.mood
+        <set>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="publishTime != null">
+                publish_time = #{publishTime},
+            </if>
+            <if test="praiseNum != null">
+                praise_num = #{praiseNum},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from ssmproject.mood
+        where id = #{id}
+    </delete>
+
+</mapper>
+
